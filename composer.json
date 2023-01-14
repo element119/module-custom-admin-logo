@@ -1,7 +1,7 @@
 {
-    "name": "element119/module-name",
+    "name": "element119/module-custom-admin-logo",
     "type": "magento2-module",
-    "description": "A Magento 2 module that...",
+    "description": "A Magento 2 module that allows admins to set the logo for their admin panel and login screen.",
     "license": "proprietary",
     "authors": [
         {
@@ -14,7 +14,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Element119\\ModuleName\\": ""
+            "Element119\\CustomAdminLogo\\": ""
         },
         "files": [
             "registration.php"
