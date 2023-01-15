@@ -7,11 +7,23 @@
 <h1 align="center">element119 | Custom Admin Logo</h1>
 
 ## 📝 Features
-✔️ ...
+✔️ Upload a custom logo for the admin login screen
 
-✔️ ...
+✔️ Upload a custom logo for the admin menu
 
-✔️ ...
+✔️ Maintains brand presence on the admin pages
+
+✔️ Easily revert to default logos
+
+✔️ Built in accordance with Magento best practises
+
+✔️ Dedicated module configuration group
+
+✔️ Seamless integration with Magento
+
+✔️ Built with developers and extensibility in mind to make customisations as easy as possible
+
+✔️ Installable via Composer
 
 <br/>
 
