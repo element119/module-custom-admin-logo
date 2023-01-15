@@ -55,7 +55,20 @@ php bin/magento setup:upgrade
 <br/>
 
 ## 📚 User Guide
-...
+Module configuration can be found by logging into the admin and navigating to `Stores -> Settings -> Configuration ->
+Advanced -> Admin -> Admin Logos`.
+
+![admin-config](https://user-images.githubusercontent.com/40261741/212520570-fec863b2-8124-4e8b-af07-af1bc83801a5.png)
+
+### Login Page
+The login page upload allows administrators to upload an image that will be displayed on the admin login page.
+
+Permitted files types include jpg, jpeg, gif, png.
+
+### Menu
+The menu upload allows administrators to upload an image that will be displayed at the top of the admin menu.
+
+Permitted files types include jpg, jpeg, gif, png.
 
 <br>
 
