@@ -33,6 +33,7 @@
                     </comment>
                     <backend_model>Element119\CustomAdminLogo\Model\Config\Backend\AdminLoginLogo</backend_model>
                     <upload_dir config="system">admin/logo/custom/login</upload_dir>
+                    <base_url type="media" scope_info="0">admin/logo/custom/login</base_url>
                 </field>
                 <field id="menu"
                        translate="label comment"
@@ -51,6 +52,7 @@
                     </comment>
                     <backend_model>Element119\CustomAdminLogo\Model\Config\Backend\AdminMenuLogo</backend_model>
                     <upload_dir config="system">admin/logo/custom/menu</upload_dir>
+                    <base_url type="media" scope_info="0">admin/logo/custom/menu</base_url>
                 </field>
             </group>
         </section>
