@@ -20,17 +20,22 @@ $adminLogoViewModel = $block->getData('admin_logo_view_model');
     <?php $edition = $block->hasEdition()
         ? 'data-edition="' . $escaper->escapeHtml($block->getEdition()) . '"'
         : ''; ?>
-    <?php $logoSrc = $adminLogoViewModel->isAdminLoginPage()
-        ? $adminLogoViewModel->getAdminLogoModel()->getCustomAdminLoginLogoSrc()
-        : $adminLogoViewModel->getAdminLogoModel()->getCustomAdminMenuLogoSrc(); ?>
+    <?php $adminLoginLogoSrc = $adminLogoViewModel->getAdminLogoModel()->getCustomAdminLoginLogoSrc(); ?>
+    <?php $adminMenuLogoSrc = $adminLogoViewModel->getAdminLogoModel()->getCustomAdminMenuLogoSrc(); ?>
 
     <a href="<?= $escaper->escapeUrl($block->getHomeLink()); ?>"
        <?= /* @noEscape */ $edition; ?>
        class="logo">
         <img class="logo-img"
-             src="<?= $logoSrc
-                 ? $escaper->escapeUrl($logoSrc)
-                 : $block->getViewFileUrl('images/magento-logo.svg'); ?>"
+             <?php if ($adminLogoViewModel->isAdminLoginPage()): ?>
+                 src="<?= $adminLoginLogoSrc
+                     ? $escaper->escapeUrl($adminLoginLogoSrc)
+                     : $block->getViewFileUrl('images/magento-logo.svg'); ?>"
+             <?php else: ?>
+                 src="<?= $adminMenuLogoSrc
+                     ? $escaper->escapeUrl($adminMenuLogoSrc)
+                     : $block->getViewFileUrl('images/magento-icon.svg'); ?>"
+             <?php endif; ?>
              alt="<?= $escaper->escapeHtml(__('Magento Admin Panel')); ?>"
              title="<?= $escaper->escapeHtml(__('Magento Admin Panel')); ?>"/>
     </a>
