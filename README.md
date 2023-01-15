@@ -73,4 +73,8 @@ Permitted files types include jpg, jpeg, gif, png.
 <br>
 
 ## 📸 Screenshots & GIFs
-Coming soon...
+### Custom Login Logo
+![admin-login](https://user-images.githubusercontent.com/40261741/212521164-ae937f0b-bbd3-491a-9185-8e6fa4264ce8.png)
+
+### Custom Menu Logo
+![admin-menu](https://user-images.githubusercontent.com/40261741/212521165-3a13ad0f-8de0-4fb3-a6c9-69663dbd6c23.png)
