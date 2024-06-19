@@ -2,7 +2,7 @@
     "name": "element119/module-custom-admin-logo",
     "type": "magento2-module",
     "description": "A Magento 2 module that allows admins to set the logo for their admin panel and login screen.",
-    "license": "proprietary",
+    "license": "MIT",
     "authors": [
         {
             "name": "Kiel Pykett",
