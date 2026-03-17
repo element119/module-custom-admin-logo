@@ -11,16 +11,6 @@ use Magento\Config\Model\Config\Backend\Image;
 
 class AdminMenuLogo extends Image
 {
-    public const UPLOAD_DIR = 'admin/logo/custom/menu';
-
-    /**
-     * @inheritDoc
-     */
-    protected function _getUploadDir(): string
-    {
-        return $this->_mediaDirectory->getAbsolutePath(self::UPLOAD_DIR);
-    }
-
     /**
      * @inheritDoc
      */

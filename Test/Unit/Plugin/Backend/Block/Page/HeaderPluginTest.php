@@ -20,19 +20,10 @@ use Psr\Log\LoggerInterface;
 
 class HeaderPluginTest extends TestCase
 {
-    /** @var ScopeConfigInterface&MockObject */
     private ScopeConfigInterface&MockObject $scopeConfig;
-
-    /** @var StoreManagerInterface&MockObject */
     private StoreManagerInterface&MockObject $storeManager;
-
-    /** @var LoggerInterface&MockObject */
     private LoggerInterface&MockObject $logger;
-
-    /** @var MockObject */
     private MockObject $header;
-
-    /** @var HeaderPlugin */
     private HeaderPlugin $plugin;
 
     protected function setUp(): void
@@ -53,13 +44,52 @@ class HeaderPluginTest extends TestCase
         );
     }
 
+    /**
+     * Helper: configure getData to return the given map plus show_part=logo.
+     */
+    private function setHeaderData(array $extra = []): void
+    {
+        $map = [['show_part', null, 'logo']];
+        foreach ($extra as $key => $value) {
+            $map[] = [$key, null, $value];
+        }
+        $this->header->method('getData')->willReturnMap($map);
+    }
+
+    // ── show_part guard ──────────────────────────────────────────────
+
+    public function testBeforeToHtmlSkipsNonLogoBlock(): void
+    {
+        $this->header->method('getData')->willReturnMap([
+            ['show_part', null, 'user'],
+        ]);
+
+        $this->scopeConfig->expects($this->never())->method('getValue');
+        $this->header->expects($this->never())->method('setLogoImageSrc');
+
+        $this->plugin->beforeToHtml($this->header);
+    }
+
+    public function testAfterGetViewFileUrlSkipsNonLogoBlock(): void
+    {
+        $this->header->method('getData')->willReturnMap([
+            ['show_part', null, 'user'],
+        ]);
+
+        $url = 'https://example.com/media/admin/logo/custom/menu/logo.png';
+        $result = $this->plugin->afterGetViewFileUrl($this->header, 'original-result', $url);
+
+        $this->assertSame('original-result', $result);
+    }
+
+    // ── beforeToHtml guard clauses ───────────────────────────────────
+
     public function testBeforeToHtmlDoesNothingWhenNoConfigPath(): void
     {
-        $this->header->method('getData')
-            ->willReturnMap([
-                ['custom_logo_config_path', null, null],
-                ['custom_logo_upload_dir', null, null],
-            ]);
+        $this->setHeaderData([
+            'custom_logo_config_path' => null,
+            'custom_logo_upload_dir' => null,
+        ]);
 
         $this->scopeConfig->expects($this->never())->method('getValue');
         $this->header->expects($this->never())->method('setLogoImageSrc');
@@ -69,11 +99,10 @@ class HeaderPluginTest extends TestCase
 
     public function testBeforeToHtmlDoesNothingWhenNoUploadDir(): void
     {
-        $this->header->method('getData')
-            ->willReturnMap([
-                ['custom_logo_config_path', null, 'admin/e119_admin_logos/menu'],
-                ['custom_logo_upload_dir', null, null],
-            ]);
+        $this->setHeaderData([
+            'custom_logo_config_path' => 'admin/e119_admin_logos/menu',
+            'custom_logo_upload_dir' => null,
+        ]);
 
         $this->scopeConfig->expects($this->never())->method('getValue');
         $this->header->expects($this->never())->method('setLogoImageSrc');
@@ -85,11 +114,10 @@ class HeaderPluginTest extends TestCase
     {
         $configPath = 'admin/e119_admin_logos/menu';
 
-        $this->header->method('getData')
-            ->willReturnMap([
-                ['custom_logo_config_path', null, $configPath],
-                ['custom_logo_upload_dir', null, 'admin/logo/custom/menu'],
-            ]);
+        $this->setHeaderData([
+            'custom_logo_config_path' => $configPath,
+            'custom_logo_upload_dir' => 'admin/logo/custom/menu',
+        ]);
 
         $this->scopeConfig->method('getValue')
             ->with($configPath)
@@ -104,11 +132,10 @@ class HeaderPluginTest extends TestCase
     {
         $configPath = 'admin/e119_admin_logos/menu';
 
-        $this->header->method('getData')
-            ->willReturnMap([
-                ['custom_logo_config_path', null, $configPath],
-                ['custom_logo_upload_dir', null, 'admin/logo/custom/menu'],
-            ]);
+        $this->setHeaderData([
+            'custom_logo_config_path' => $configPath,
+            'custom_logo_upload_dir' => 'admin/logo/custom/menu',
+        ]);
 
         $this->scopeConfig->method('getValue')
             ->with($configPath)
@@ -123,11 +150,10 @@ class HeaderPluginTest extends TestCase
     {
         $configPath = 'admin/e119_admin_logos/menu';
 
-        $this->header->method('getData')
-            ->willReturnMap([
-                ['custom_logo_config_path', null, $configPath],
-                ['custom_logo_upload_dir', null, 'admin/logo/custom/menu'],
-            ]);
+        $this->setHeaderData([
+            'custom_logo_config_path' => $configPath,
+            'custom_logo_upload_dir' => 'admin/logo/custom/menu',
+        ]);
 
         $this->scopeConfig->method('getValue')
             ->with($configPath)
@@ -138,17 +164,18 @@ class HeaderPluginTest extends TestCase
         $this->plugin->beforeToHtml($this->header);
     }
 
+    // ── beforeToHtml security ────────────────────────────────────────
+
     public function testBeforeToHtmlStripsPathTraversalFromFilename(): void
     {
         $configPath = 'admin/e119_admin_logos/menu';
         $uploadDir = 'admin/logo/custom/menu';
         $mediaUrl = 'https://example.com/media/';
 
-        $this->header->method('getData')
-            ->willReturnMap([
-                ['custom_logo_config_path', null, $configPath],
-                ['custom_logo_upload_dir', null, $uploadDir],
-            ]);
+        $this->setHeaderData([
+            'custom_logo_config_path' => $configPath,
+            'custom_logo_upload_dir' => $uploadDir,
+        ]);
 
         $this->scopeConfig->method('getValue')
             ->with($configPath)
@@ -167,6 +194,8 @@ class HeaderPluginTest extends TestCase
         $this->plugin->beforeToHtml($this->header);
     }
 
+    // ── beforeToHtml happy path ──────────────────────────────────────
+
     public function testBeforeToHtmlSetsMenuLogoUrl(): void
     {
         $configPath = 'admin/e119_admin_logos/menu';
@@ -174,11 +203,10 @@ class HeaderPluginTest extends TestCase
         $filename = 'my-logo.png';
         $mediaUrl = 'https://example.com/media/';
 
-        $this->header->method('getData')
-            ->willReturnMap([
-                ['custom_logo_config_path', null, $configPath],
-                ['custom_logo_upload_dir', null, $uploadDir],
-            ]);
+        $this->setHeaderData([
+            'custom_logo_config_path' => $configPath,
+            'custom_logo_upload_dir' => $uploadDir,
+        ]);
 
         $this->scopeConfig->method('getValue')
             ->with($configPath)
@@ -204,11 +232,10 @@ class HeaderPluginTest extends TestCase
         $filename = 'login-logo.jpg';
         $mediaUrl = 'https://example.com/media/';
 
-        $this->header->method('getData')
-            ->willReturnMap([
-                ['custom_logo_config_path', null, $configPath],
-                ['custom_logo_upload_dir', null, $uploadDir],
-            ]);
+        $this->setHeaderData([
+            'custom_logo_config_path' => $configPath,
+            'custom_logo_upload_dir' => $uploadDir,
+        ]);
 
         $this->scopeConfig->method('getValue')
             ->with($configPath)
@@ -227,15 +254,16 @@ class HeaderPluginTest extends TestCase
         $this->plugin->beforeToHtml($this->header);
     }
 
+    // ── beforeToHtml error handling ──────────────────────────────────
+
     public function testBeforeToHtmlHandlesNoSuchEntityException(): void
     {
         $configPath = 'admin/e119_admin_logos/menu';
 
-        $this->header->method('getData')
-            ->willReturnMap([
-                ['custom_logo_config_path', null, $configPath],
-                ['custom_logo_upload_dir', null, 'admin/logo/custom/menu'],
-            ]);
+        $this->setHeaderData([
+            'custom_logo_config_path' => $configPath,
+            'custom_logo_upload_dir' => 'admin/logo/custom/menu',
+        ]);
 
         $this->scopeConfig->method('getValue')
             ->with($configPath)
@@ -256,8 +284,39 @@ class HeaderPluginTest extends TestCase
         $this->plugin->beforeToHtml($this->header);
     }
 
+    public function testBeforeToHtmlHandlesUnexpectedThrowable(): void
+    {
+        $configPath = 'admin/e119_admin_logos/menu';
+
+        $this->setHeaderData([
+            'custom_logo_config_path' => $configPath,
+            'custom_logo_upload_dir' => 'admin/logo/custom/menu',
+        ]);
+
+        $this->scopeConfig->method('getValue')
+            ->with($configPath)
+            ->willReturn('logo.png');
+
+        $this->storeManager->method('getStore')
+            ->willThrowException(new \RuntimeException('Unexpected failure'));
+
+        $this->logger->expects($this->once())
+            ->method('error')
+            ->with(
+                'Element119_CustomAdminLogo: Unexpected error resolving media URL.',
+                $this->arrayHasKey('exception')
+            );
+
+        $this->header->expects($this->never())->method('setLogoImageSrc');
+
+        $this->plugin->beforeToHtml($this->header);
+    }
+
+    // ── afterGetViewFileUrl ──────────────────────────────────────────
+
     public function testAfterGetViewFileUrlPassesThroughHttpsUrl(): void
     {
+        $this->setHeaderData();
         $url = 'https://example.com/media/admin/logo/custom/menu/logo.png';
 
         $result = $this->plugin->afterGetViewFileUrl($this->header, 'ignored', $url);
@@ -267,6 +326,7 @@ class HeaderPluginTest extends TestCase
 
     public function testAfterGetViewFileUrlPassesThroughHttpUrl(): void
     {
+        $this->setHeaderData();
         $url = 'http://example.com/media/admin/logo/custom/login/logo.png';
 
         $result = $this->plugin->afterGetViewFileUrl($this->header, 'ignored', $url);
@@ -276,6 +336,7 @@ class HeaderPluginTest extends TestCase
 
     public function testAfterGetViewFileUrlReturnsOriginalResultForViewFile(): void
     {
+        $this->setHeaderData();
         $resolvedUrl = 'https://example.com/static/adminhtml/Magento/backend/en_US/images/mage-os-icon.svg';
 
         $result = $this->plugin->afterGetViewFileUrl(

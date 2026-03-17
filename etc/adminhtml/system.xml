@@ -13,8 +13,8 @@
                    translate="label"
                    sortOrder="100"
                    showInDefault="1"
-                   showInWebsite="1"
-                   showInStore="1">
+                   showInWebsite="0"
+                   showInStore="0">
                 <label>Admin Logos</label>
                 <field id="login"
                        translate="label comment"
