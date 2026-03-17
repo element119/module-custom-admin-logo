@@ -7,14 +7,11 @@
 -->
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
-    <head>
-        <css src="Element119_CustomAdminLogo::css/module.css" rel="stylesheet" type="text/css"/>
-    </head>
     <body>
         <referenceBlock name="logo">
             <arguments>
-                <argument name="custom_logo_config_path" xsi:type="string">admin/e119_admin_logos/menu</argument>
-                <argument name="custom_logo_upload_dir" xsi:type="string">admin/logo/custom/menu</argument>
+                <argument name="custom_logo_config_path" xsi:type="string">admin/e119_admin_logos/login</argument>
+                <argument name="custom_logo_upload_dir" xsi:type="string">admin/logo/custom/login</argument>
             </arguments>
         </referenceBlock>
     </body>
