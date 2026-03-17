@@ -1,7 +1,7 @@
 <?php
 /**
  * Copyright © element119. All rights reserved.
- * See LICENCE.txt for licence details.
+ * See LICENSE for license details.
  */
 declare(strict_types=1);
 

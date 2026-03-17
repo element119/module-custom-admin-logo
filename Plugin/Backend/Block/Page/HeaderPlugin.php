@@ -1,7 +1,7 @@
 <?php
 /**
  * Copyright © element119. All rights reserved.
- * See LICENCE.txt for licence details.
+ * See LICENSE for license details.
  */
 declare(strict_types=1);
 
@@ -9,20 +9,42 @@ namespace Element119\CustomAdminLogo\Plugin\Backend\Block\Page;
 
 use Magento\Backend\Block\Page\Header;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\UrlInterface;
 use Magento\Store\Model\StoreManagerInterface;
+use Psr\Log\LoggerInterface;
 
+/**
+ * Plugin that injects custom admin logo URLs into the Header block.
+ *
+ * Replaces a template override approach: layout XML arguments drive which
+ * config path and upload directory apply per layout handle (login vs. menu),
+ * and the core template renders the custom logo without modification.
+ */
 class HeaderPlugin
 {
+    /** @var ScopeConfigInterface */
     private ScopeConfigInterface $scopeConfig;
+
+    /** @var StoreManagerInterface */
     private StoreManagerInterface $storeManager;
 
+    /** @var LoggerInterface */
+    private LoggerInterface $logger;
+
+    /**
+     * @param ScopeConfigInterface $scopeConfig
+     * @param StoreManagerInterface $storeManager
+     * @param LoggerInterface $logger
+     */
     public function __construct(
         ScopeConfigInterface $scopeConfig,
-        StoreManagerInterface $storeManager
+        StoreManagerInterface $storeManager,
+        LoggerInterface $logger
     ) {
         $this->scopeConfig = $scopeConfig;
         $this->storeManager = $storeManager;
+        $this->logger = $logger;
     }
 
     /**
@@ -30,6 +52,9 @@ class HeaderPlugin
      *
      * Reads the config path and upload directory from layout XML arguments
      * to determine which custom logo (login or menu) applies to this context.
+     *
+     * @param Header $subject
+     * @return void
      */
     public function beforeToHtml(Header $subject): void
     {
@@ -42,12 +67,26 @@ class HeaderPlugin
 
         $filename = $this->scopeConfig->getValue($configPath);
 
-        if (!$filename) {
+        if (!is_string($filename) || $filename === '') {
             return;
         }
 
-        $mediaUrl = $this->storeManager->getStore()
-            ->getBaseUrl(UrlInterface::URL_TYPE_MEDIA);
+        $filename = basename($filename);
+
+        if ($filename === '') {
+            return;
+        }
+
+        try {
+            $mediaUrl = $this->storeManager->getStore()
+                ->getBaseUrl(UrlInterface::URL_TYPE_MEDIA);
+        } catch (NoSuchEntityException $e) {
+            $this->logger->warning(
+                'Element119_CustomAdminLogo: Unable to resolve store for media URL.',
+                ['exception' => $e]
+            );
+            return;
+        }
 
         $subject->setLogoImageSrc($mediaUrl . $uploadDir . '/' . $filename);
     }
@@ -57,7 +96,13 @@ class HeaderPlugin
      *
      * When a custom logo is configured, logo_image_src is set to a full media
      * URL. The core template passes this to getViewFileUrl(), which would
-     * attempt static file resolution. This plugin short-circuits that for URLs.
+     * attempt static file resolution. This plugin short-circuits that for
+     * absolute URLs, returning the fileId as-is.
+     *
+     * @param Header $subject
+     * @param string $result
+     * @param string $fileId
+     * @return string
      */
     public function afterGetViewFileUrl(
         Header $subject,
