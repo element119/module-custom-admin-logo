@@ -58,6 +58,10 @@ class HeaderPlugin
      */
     public function beforeToHtml(Header $subject): void
     {
+        if ($subject->getData('show_part') !== 'logo') {
+            return;
+        }
+
         $configPath = $subject->getData('custom_logo_config_path');
         $uploadDir = $subject->getData('custom_logo_upload_dir');
 
@@ -86,6 +90,12 @@ class HeaderPlugin
                 ['exception' => $e]
             );
             return;
+        } catch (\Throwable $e) {
+            $this->logger->error(
+                'Element119_CustomAdminLogo: Unexpected error resolving media URL.',
+                ['exception' => $e]
+            );
+            return;
         }
 
         $subject->setLogoImageSrc($mediaUrl . $uploadDir . '/' . $filename);
@@ -107,8 +117,12 @@ class HeaderPlugin
     public function afterGetViewFileUrl(
         Header $subject,
         string $result,
-        string $fileId
+        string $fileId = ''
     ): string {
+        if ($subject->getData('show_part') !== 'logo') {
+            return $result;
+        }
+
         if (str_starts_with($fileId, 'http://') || str_starts_with($fileId, 'https://')) {
             return $fileId;
         }

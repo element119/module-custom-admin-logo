@@ -10,7 +10,10 @@
         }
     ],
     "require": {
-        "magento/module-config": "^101.0"
+        "magento/framework": "*",
+        "magento/module-backend": "*",
+        "magento/module-config": "^101.0",
+        "magento/module-store": "*"
     },
     "autoload": {
         "psr-4": {
