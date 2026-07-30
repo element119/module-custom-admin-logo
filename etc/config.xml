@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © element119. All rights reserved.
+ * See LICENSE for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <system>
+            <media_storage_configuration>
+                <allowed_resources>
+                    <!--
+                        The logos are uploaded to media/admin/logo/custom/{login,menu}/.
+                        When remote storage is enabled those files do not exist on the
+                        web server's filesystem, so the web server falls through to
+                        pub/get.php, which serves only paths whose prefix is listed
+                        here. Without this entry both logos 404 while sitting in the
+                        remote bucket. Inert on a local filesystem, where the web
+                        server serves the files directly.
+                    -->
+                    <admin_logo>admin/logo</admin_logo>
+                </allowed_resources>
+            </media_storage_configuration>
+        </system>
+    </default>
+</config>
