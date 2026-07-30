@@ -70,6 +70,13 @@ The menu upload allows administrators to upload an image that will be displayed 
 
 Permitted files types include jpg, jpeg, gif, png.
 
+### Remote Storage
+Both logos are uploaded to `media/admin/logo/custom/{login,menu}/`. On installations using
+[remote storage](https://developer.adobe.com/commerce/php/development/components/remote-storage/) (S3, Azure, GCS)
+those files never exist on the web server's filesystem, so requests fall through to `pub/get.php`, which serves only
+paths whitelisted in `system/media_storage_configuration/allowed_resources`. This module registers the `admin/logo`
+prefix there, so no additional configuration is required. The entry is inert on a local filesystem.
+
 <br>
 
 ## 📸 Screenshots & GIFs
