@@ -8,7 +8,6 @@ declare(strict_types=1);
 namespace Element119\CustomAdminLogo\Test\Unit\Plugin\Backend\Block\Page;
 
 use Element119\CustomAdminLogo\Plugin\Backend\Block\Page\HeaderPlugin;
-use Magento\Backend\Block\Page\Header;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\UrlInterface;
@@ -31,10 +30,9 @@ class HeaderPluginTest extends TestCase
         $this->scopeConfig = $this->createMock(ScopeConfigInterface::class);
         $this->storeManager = $this->createMock(StoreManagerInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
-        $this->header = $this->getMockBuilder(Header::class)
+        $this->header = $this->getMockBuilder(HeaderStub::class)
             ->disableOriginalConstructor()
-            ->addMethods(['setLogoImageSrc'])
-            ->onlyMethods(['getData'])
+            ->onlyMethods(['getData', 'setLogoImageSrc'])
             ->getMock();
 
         $this->plugin = new HeaderPlugin(
